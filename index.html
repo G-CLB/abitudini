@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Abitudini</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Abitudini">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+/* ===== 1. COLORI (cambia qui l'aspetto) ===== */
+:root{--bg:#f2f2f7;--card:#fff;--text:#1c1c1e;--mut:#6c6c70;--line:#e5e5ea;--acc:#1a9b4b;--accsoft:rgba(26,155,75,.14);--danger:#d70015;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--text:#f2f2f7;--mut:#98989f;--line:#38383a;--acc:#30d158;--accsoft:rgba(48,209,88,.18);--danger:#ff453a}}
+/* ===== 2. BASE ===== */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;overscroll-behavior:none}
+#app{height:100%;display:flex;flex-direction:column}
+main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top) + 14px) 16px 28px}
+button{font:inherit;color:inherit;border:0;background:none;min-height:44px;min-width:44px;cursor:pointer;padding:0}
+input,select,textarea{font:inherit;font-size:16px;color:var(--text);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 12px;width:100%;min-height:44px}
+h1{font-size:30px;letter-spacing:-.5px;margin:2px 0 10px;text-transform:capitalize}
+h2{font-size:20px;margin:0 0 12px}h3{font-size:13px;color:var(--mut);margin:20px 4px 8px;font-weight:600}
+.mut,.sub{color:var(--mut)}.sub{margin:-4px 0 14px}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:8px}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+/* ===== 3. CARD E COMPONENTI ===== */
+.card{background:var(--card);border-radius:18px;padding:14px 16px;margin-bottom:12px}
+.add{width:44px;height:44px;border-radius:50%;background:var(--acc);color:#fff;font-size:28px;line-height:1}
+.btn{background:var(--acc);color:#fff;border-radius:14px;padding:0 18px;font-weight:600}
+.btn.sec{background:var(--card);color:var(--text)}.btn.red{background:none;color:var(--danger)}
+.strip{display:flex;gap:6px;margin-bottom:14px}
+.strip button{flex:1;border-radius:14px;background:var(--card);padding:6px 0;display:flex;flex-direction:column;align-items:center;font-size:12px;color:var(--mut)}
+.strip b{font-size:17px;color:var(--text)}.strip .sel,.strip .sel b{background:var(--acc);color:#fff}
+.habit{display:flex;align-items:center;gap:12px}
+.ring{position:relative;width:52px;height:52px;flex:none}
+.ring svg{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke-width:4}
+.rt{stroke:var(--line)}.rp{stroke:var(--c);stroke-linecap:round;transition:stroke-dasharray .5s}
+.ring span{position:absolute;inset:0;display:grid;place-items:center;font-size:22px}
+.info{flex:1;min-width:0}.info b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.info small{color:var(--mut)}
+.check{width:48px;height:48px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;flex:none;transition:.2s}
+.check svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0;transform:scale(.4);transition:.2s}
+.check.on{background:var(--c);border-color:var(--c)}.check.on svg{opacity:1;transform:none}
+.pop{animation:pop .35s}@keyframes pop{40%{transform:scale(1.25)}}
+.empty{text-align:center;padding:48px 16px}.empty .big{font-size:56px}.empty p{color:var(--mut);margin:8px 0 18px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 0}
+.row+.row{border-top:1px solid var(--line)}
+.warn{color:var(--danger)}
+.habit{flex-wrap:wrap;row-gap:0}.hd span{display:flex;align-items:center;gap:8px}
+.r2{flex-basis:100%;display:flex;gap:8px}
+.note{flex:1;min-width:0;text-align:left;color:var(--mut);font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dec{font-size:26px;color:var(--mut)}.mv{color:var(--acc);font-size:18px}
+.check em{grid-area:1/1;font-style:normal;font-size:12px;font-weight:600}.check svg{grid-area:1/1}
+textarea{resize:none}
+/* ===== 4. STATISTICHE ===== */
+.kpis{display:flex;gap:12px}.kpis .card{flex:1;margin:0}.kpis b{display:block;font-size:30px;letter-spacing:-1px;color:var(--acc)}
+.bars{display:flex;gap:8px;height:130px}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--mut)}
+.bt{flex:1;width:100%;display:flex;align-items:flex-end;background:var(--accsoft);border-radius:8px;overflow:hidden}
+.bt i{width:100%;background:var(--acc);border-radius:8px;transition:height .5s}
+.heat{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;text-align:center;font-size:12px}
+.heat div{aspect-ratio:1;border-radius:8px;display:grid;place-items:center;background:color-mix(in srgb,var(--acc) var(--p,0%),var(--line));color:var(--mut)}
+.heat .hi{color:#fff}.heat .td{outline:2px solid var(--text)}.heat .dl{background:none;aspect-ratio:auto}
+.trow{display:grid;grid-template-columns:1fr 46px 46px 56px;gap:6px;font-size:14px;align-items:center;padding:6px 0}
+.trow+.trow{border-top:1px solid var(--line)}.trow span+span{text-align:right}
+/* ===== 5. BARRA IN BASSO ===== */
+nav{display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--mut)}
+nav button.on{color:var(--acc)}
+nav svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+/* ===== 6. FOGLIO DI MODIFICA E AVVISI ===== */
+#ov{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;z-index:5}#ov.open{display:flex}
+.sheet{background:var(--bg);width:100%;max-height:92%;overflow:auto;border-radius:22px 22px 0 0;padding:18px 16px calc(env(safe-area-inset-bottom) + 18px);animation:up .25s}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+.sheet label{display:block;font-size:13px;color:var(--mut);margin:14px 4px 6px;font-weight:600}
+.grid{display:grid;gap:8px}.grid button{border-radius:12px;background:var(--card);font-size:20px}
+.grid .sel{outline:3px solid var(--acc);background:var(--accsoft)}.grid .sw{border-radius:50%}
+.acts{display:flex;gap:10px;margin-top:18px}.acts .btn{flex:1;min-height:48px}
+#toast{position:fixed;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom) + 70px);background:#2c2c2e;color:#fff;padding:12px 16px;border-radius:14px;z-index:9;display:none;text-align:center}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app">
+  <main id="main"></main>
+  <nav>
+    <button data-act="tab" data-id="today"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17M9 15l2 2 4-4"/></svg>Oggi</button>
+    <button data-act="tab" data-id="stats"><svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6"/></svg>Statistiche</button>
+    <button data-act="tab" data-id="set"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>Impostazioni</button>
+  </nav>
+</div>
+<div id="ov"></div>
+<div id="toast" role="status"></div>
+<input type="file" id="file" accept=".json,application/json" hidden>
+
+<script>
+'use strict';
+/* ===== 1. DATE (sempre ora LOCALE, mai UTC) ===== */
+const pad=n=>String(n).padStart(2,'0');
+const key=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());      // data -> "2026-11-03"
+const parse=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};  // "2026-11-03" -> data locale
+const add=(d,n)=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()+n);return x};
+const today=()=>{const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())};
+const monday=d=>add(d,-((d.getDay()+6)%7));                                       // la settimana inizia di lunedì
+const itd=(d,o)=>d.toLocaleDateString('it-IT',o);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const $=s=>document.querySelector(s);
+
+/* ===== 2. DATI E SALVATAGGIO ===== */
+const KEY='habit-tracker-v1';
+const COLORS=['#34c759','#0a84ff','#ff9f0a','#ff375f','#bf5af2','#64d2ff','#ac8e68','#ff6b3d'];
+const EMOJI='💧🏃🧘📚💪🥗😴🚶🧠✍️🎸🌱🦷💊🚭☀️🧹🍎🎯🛏️🙏🧴📵🏊'.match(/\p{Extended_Pictographic}\uFE0F?/gu);
+let S={v:1,habits:[],lastBackup:null};   // S = tutti i dati dell'app
+let ui={tab:'today',sel:key(today()),todayKey:key(today()),sh:'all',my:today().getFullYear(),mm:today().getMonth()};
+let ed=null;                              // abitudine in modifica
+
+// Controlla e ripulisce un oggetto dati. Se qualcosa non va, lancia un errore con un messaggio chiaro.
+function sanitize(o){
+  const re=/^\d{4}-\d{2}-\d{2}$/;
+  if(!o||typeof o!=='object'||!Array.isArray(o.habits))throw new Error('Il file non contiene un elenco di abitudini.');
+  const ids=new Set();
+  const habits=o.habits.map((h,i)=>{
+    const n='Abitudine '+(i+1)+': ';
+    if(!h||typeof h.name!=='string'||!h.name.trim())throw new Error(n+'nome mancante.');
+    if(typeof h.created!=='string'||!re.test(h.created))throw new Error(n+'data di creazione non valida.');
+    if(!Array.isArray(h.days)||!h.days.length||!h.days.every(x=>Number.isInteger(x)&&x>=0&&x<=6))throw new Error(n+'giorni non validi.');
+    const log={};
+    if(h.log&&typeof h.log==='object')for(const k in h.log){if(!re.test(k))throw new Error(n+'registro con date non valide.');if(h.log[k])log[k]=Math.min(9999,Math.max(1,Math.floor(Number(h.log[k]))||1))}
+    const notes={};if(h.notes&&typeof h.notes==='object')for(const k in h.notes)if(re.test(k)&&typeof h.notes[k]==='string'&&h.notes[k].trim())notes[k]=h.notes[k].slice(0,200);
+    const id=typeof h.id==='string'&&h.id&&!ids.has(h.id)?h.id:uid();ids.add(id);
+    return{id,name:h.name.trim().slice(0,40),emoji:typeof h.emoji==='string'&&h.emoji?[...h.emoji].slice(0,4).join(''):'⭐',
+      color:/^#[0-9a-f]{6}$/i.test(h.color)?h.color:COLORS[0],days:[...new Set(h.days)],created:h.created,archived:!!h.archived,log,notes,goal:Number.isInteger(h.goal)&&h.goal>0&&h.goal<=999?h.goal:1,group:h.group==='m'||h.group==='s'?h.group:''};
+  });
+  return{v:1,habits,lastBackup:typeof o.lastBackup==='string'&&re.test(o.lastBackup)?o.lastBackup:null};
+}
+function load(){
+  let raw=null;
+  try{raw=localStorage.getItem(KEY);if(raw)S=sanitize(JSON.parse(raw))}
+  catch(e){ // dati illeggibili: li metto da parte invece di cancellarli
+    try{if(raw)localStorage.setItem(KEY+'-corrotto',raw)}catch(_){}
+    S={v:1,habits:[],lastBackup:null};
+    toast('Non riesco a leggere i dati salvati. Ne ho conservato una copia.');
+  }
+}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(S));navigator.storage?.persist?.();return true}
+  catch(e){toast('Impossibile salvare: memoria piena o accesso negato. Esporta subito un backup.');return false}
+}
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(tt);tt=setTimeout(()=>t.style.display='none',3800)}
+
+/* ===== 3. LOGICA ABITUDINI ===== */
+const get=id=>S.habits.find(h=>h.id===id);
+const sched=(h,d)=>h.days.includes(d.getDay())&&key(d)>=h.created;   // l'abitudine è prevista in quel giorno?
+const isDone=(h,k)=>(h.log[k]||0)>=(h.goal||1);   // abitudine completata in quel giorno?
+function stats(h,from,to){let s=0,c=0;for(let d=from;d<=to;d=add(d,1))if(sched(h,d)){s++;if(isDone(h,key(d)))c++}return{s,c}}
+function streaks(h){ // serie attuale e record. Oggi non ancora spuntato NON interrompe la serie.
+  const t=today(),tk=key(t);let run=0,best=0;
+  for(let d=parse(h.created);d<=t;d=add(d,1)){
+    if(!sched(h,d))continue;
+    if(isDone(h,key(d))){run++;best=Math.max(best,run)}else if(key(d)!==tk)run=0;
+  }
+  return{cur:run,best};
+}
+
+/* ===== 4. SCHEDE ===== */
+const emptyHTML=()=>`<div class="empty"><div class="big">🌱</div><h2>Nessuna abitudine</h2><p>Crea la tua prima abitudine e spuntala ogni giorno.</p><button class="btn" style="min-height:48px" data-act="new">Crea abitudine</button></div>`;
+
+const MIL=[7,30,100,365];                                   // traguardi della serie
+const badge=b=>b>=365?'💎':b>=100?'🥇':b>=30?'🥈':b>=7?'🥉':'';
+const GR=[['m','Mattina'],['','Durante il giorno'],['s','Sera']];   // gruppi
+const bkDue=()=>S.habits.some(h=>Object.keys(h.log).length)&&(!S.lastBackup||(today()-parse(S.lastBackup))/864e5>=7);
+
+function card(h){
+  const t=today(),w=stats(h,monday(t),add(monday(t),6)),k=streaks(h),n=h.log[ui.sel]||0,g=h.goal||1,on=n>=g,p=w.s?w.c/w.s:0,note=(h.notes||{})[ui.sel];
+  return `<div class="card habit" style="--c:${h.color}" data-hid="${h.id}">
+  <button class="ring" data-act="edit" data-id="${h.id}" aria-label="Modifica ${esc(h.name)}"><svg viewBox="0 0 52 52"><circle class="rt" cx="26" cy="26" r="23"/><circle class="rp" cx="26" cy="26" r="23" stroke-dasharray="${(p*144.5).toFixed(1)} 144.5" transform="rotate(-90 26 26)"/></svg><span>${esc(h.emoji)}</span></button>
+  <div class="info"><b>${esc(h.name)}</b><small>Settimana ${w.c}/${w.s} · 🔥 ${k.cur} · record ${k.best} ${badge(k.best)}</small></div>
+  <button class="check ${on?'on':''}" data-act="toggle" data-id="${h.id}" aria-pressed="${on}" aria-label="Segna ${esc(h.name)} (${n} su ${g})">${g>1&&!on?`<em>${n}/${g}</em>`:''}<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+  <div class="r2"><button class="note" data-act="note" data-id="${h.id}">📝 ${note?esc(note):'Aggiungi nota'}</button>${g>1?`<button class="dec" data-act="dec" data-id="${h.id}" aria-label="Togli uno">−</button>`:''}</div></div>`;
+}
+const rcard=h=>`<div class="card habit" style="--c:${h.color}"><span style="font-size:24px">${esc(h.emoji)}</span><div class="info"><b>${esc(h.name)}</b></div><button class="mv" data-act="up" data-id="${h.id}" aria-label="Sposta su">▲</button><button class="mv" data-act="dn" data-id="${h.id}" aria-label="Sposta giù">▼</button></div>`;
+
+function viewToday(){
+  const t=today(),sel=parse(ui.sel),isT=ui.sel===key(t);
+  const act=S.habits.filter(h=>!h.archived),list=ui.reorder?act:act.filter(h=>sched(h,sel));
+  const done=list.filter(h=>isDone(h,ui.sel)).length;
+  let strip='';
+  for(let i=6;i>=0;i--){const d=add(t,-i),k=key(d);strip+=`<button data-act="sel" data-id="${k}" class="${k===ui.sel?'sel':''}" aria-label="${itd(d,{weekday:'long',day:'numeric',month:'long'})}">${itd(d,{weekday:'short'})}<b>${d.getDate()}</b></button>`}
+  let body;
+  if(!act.length)body=emptyHTML();
+  else if(!list.length)body='<div class="card mut">Nessuna abitudine prevista per questo giorno.</div>';
+  else{const gs=GR.filter(([g])=>list.some(h=>h.group===g));
+    body=gs.map(([g,l])=>(gs.length>1?`<h3>${l}</h3>`:'')+list.filter(h=>h.group===g).map(ui.reorder?rcard:card).join('')).join('')}
+  const bk=!ui.reorder&&!ui.hideBk&&bkDue()?`<div class="card"><b>È ora di un backup 💾</b><p class="mut" style="margin:4px 0 10px">Sono passati 7 giorni o più. Il telefono non permette il salvataggio automatico: un tocco e il file è pronto.</p><div class="acts" style="margin:0"><button class="btn" data-act="export">Esporta ora</button><button class="btn sec" data-act="later">Più tardi</button></div></div>`:'';
+  return `<div class="hd"><h1>${ui.reorder?'Riordina':isT?'Oggi':itd(sel,{weekday:'long',day:'numeric',month:'long'})}</h1><span>${act.length>1?`<button data-act="reorder" style="color:var(--acc);font-weight:600">${ui.reorder?'Fine':'Riordina'}</button>`:''}${ui.reorder?'':'<button class="add" data-act="new" aria-label="Nuova abitudine">+</button>'}</span></div>`
+    +(act.length&&!ui.reorder?`<p class="sub">${done} di ${list.length} completate</p><div class="strip">${strip}</div>`:'')+bk+body;
+}
+function viewStats(){
+  const t=today(),act=S.habits.filter(h=>!h.archived);
+  if(!act.length)return`<h1>Statistiche</h1>`+emptyHTML();
+  if(ui.sh!=='all'&&!act.some(h=>h.id===ui.sh))ui.sh='all';
+  const tg=ui.sh==='all'?act:act.filter(h=>h.id===ui.sh);
+  const sum=(a,b)=>tg.reduce((r,h)=>{const x=stats(h,a,b);r.s+=x.s;r.c+=x.c;return r},{s:0,c:0});
+  const pc=r=>r.s?Math.round(r.c/r.s*100):null,fp=p=>p===null?'–':p+'%';
+  const ws=monday(t);
+  let bars='';
+  for(let i=0;i<7;i++){const d=add(ws,i),r=sum(d,d),p=d>t||!r.s?0:r.c/r.s*100;
+    bars+=`<div class="bar"><div class="bt"><i style="height:${p}%"></i></div><span>${'DLMMGVS'[d.getDay()]}</span></div>`}
+  const first=new Date(ui.my,ui.mm,1),n=new Date(ui.my,ui.mm+1,0).getDate(),lead=(first.getDay()+6)%7;
+  let heat='DLMMGVS'.slice(1).split('').concat('D').map(c=>`<div class="dl">${c}</div>`).join('')+'<div class="dl"></div>'.repeat(lead);
+  for(let i=1;i<=n;i++){const d=new Date(ui.my,ui.mm,i),r=sum(d,d);let p='';
+    if(d<=t&&r.s)p=r.c?Math.round(30+70*r.c/r.s):12;
+    heat+=`<div style="${p!==''?'--p:'+p+'%':''}" class="${p>55?'hi':''} ${key(d)===key(t)?'td':''}">${i}</div>`}
+  const isCur=ui.my===t.getFullYear()&&ui.mm===t.getMonth();
+  const rows=ui.sh!=='all'?'':`<h3>Per abitudine</h3><div class="card"><div class="trow mut"><span></span><span>Sett.</span><span>Mese</span><span>Serie</span></div>`+
+    act.map(h=>{const k=streaks(h);return`<div class="trow"><span>${esc(h.emoji)} ${esc(h.name)}</span><span>${fp(pc(stats(h,ws,t)))}</span><span>${fp(pc(stats(h,new Date(t.getFullYear(),t.getMonth(),1),t)))}</span><span>🔥${k.cur}/${k.best}</span></div>`}).join('')+'</div>';
+  return `<h1>Statistiche</h1>
+  <select id="sh" aria-label="Abitudine"><option value="all">Tutte le abitudini</option>${act.map(h=>`<option value="${h.id}" ${h.id===ui.sh?'selected':''}>${esc(h.emoji)} ${esc(h.name)}</option>`).join('')}</select>
+  <div class="kpis" style="margin-top:12px"><div class="card"><b>${fp(pc(sum(ws,t)))}</b>questa settimana</div><div class="card"><b>${fp(pc(sum(new Date(t.getFullYear(),t.getMonth(),1),t)))}</b>questo mese</div></div>
+  <h3>Settimana</h3><div class="card"><div class="bars">${bars}</div></div>
+  <h3>Mese</h3><div class="card"><div class="row"><button data-act="mprev" aria-label="Mese precedente">‹</button><b style="text-transform:capitalize">${itd(first,{month:'long',year:'numeric'})}</b><button data-act="mnext" ${isCur?'disabled style="opacity:.3"':''} aria-label="Mese successivo">›</button></div><div class="heat">${heat}</div></div>`+rows;
+}
+function viewSet(){
+  const arch=S.habits.filter(h=>h.archived);
+  const old=bkDue();
+  return `<h1>Impostazioni</h1>
+  <h3>Dati e backup</h3><div class="card">
+   <p class="${old?'warn':'mut'}" style="margin-top:0">${S.lastBackup?'Ultimo backup: '+itd(parse(S.lastBackup),{day:'numeric',month:'long',year:'numeric'}):'Non hai ancora fatto nessun backup.'}${old?' Ti consiglio di farne uno ora.':''}</p>
+   <div class="acts" style="margin:0"><button class="btn" data-act="export">Esporta</button><button class="btn sec" data-act="import">Importa</button></div>
+   <p class="mut" style="font-size:13px;margin-bottom:0">I dati restano solo su questo telefono. L'esportazione crea un file JSON da conservare (iCloud, Drive, email a te stesso).</p></div>
+  <h3>Promemoria</h3><div class="card mut">Non li ho inclusi, perché sarebbero inaffidabili: una web app senza server non può far suonare una notifica quando è chiusa. Un timer simulato funzionerebbe solo ad app aperta. Usa invece un promemoria o una sveglia ricorrente nell'app Promemoria/Orologio del telefono.</div>
+  ${arch.length?`<h3>Archiviate</h3><div class="card">${arch.map(h=>`<div class="row"><span>${esc(h.emoji)} ${esc(h.name)}</span><span><button data-act="restore" data-id="${h.id}" style="color:var(--acc)">Ripristina</button><button data-act="del" data-id="${h.id}" class="warn">Elimina</button></span></div>`).join('')}</div>`:''}
+  <h3>Zona pericolosa</h3><div class="card"><button class="btn red" style="width:100%" data-act="reset">Cancella tutti i dati</button></div>`;
+}
+function render(){
+  const m=$('#main'),st=m.scrollTop;
+  m.innerHTML=ui.tab==='today'?viewToday():ui.tab==='stats'?viewStats():viewSet();
+  m.scrollTop=st;
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.id===ui.tab));
+}
+
+/* ===== 5. FOGLIO DI MODIFICA ===== */
+function openSheet(){
+  const dm=[1,2,3,4,5,6,0],dl='LMMGVSD';
+  const ov=$('#ov'),old=ov.firstElementChild?ov.firstElementChild.scrollTop:0;
+  ov.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><h2>${ed.id?'Modifica abitudine':'Nuova abitudine'}</h2>
+  <label for="nm">Nome</label><input id="nm" maxlength="40" value="${esc(ed.name)}" placeholder="Es. Bere acqua" autocomplete="off">
+  <label for="emo">Emoji (scegline una o scrivi la tua)</label><input id="emo" value="${esc(ed.emoji)}">
+  <div class="grid" style="grid-template-columns:repeat(6,1fr);margin-top:8px">${EMOJI.map(e=>`<button data-act="pe" data-id="${e}" class="${e===ed.emoji?'sel':''}">${e}</button>`).join('')}</div>
+  <label>Colore</label><div class="grid" style="grid-template-columns:repeat(8,1fr)">${COLORS.map(c=>`<button data-act="pc" data-id="${c}" class="sw ${c===ed.color?'sel':''}" style="background:${c}" aria-label="Colore ${c}"></button>`).join('')}</div>
+  <label for="gl">Obiettivo al giorno (1 = basta una spunta)</label><input id="gl" type="number" inputmode="numeric" min="1" max="999" value="${ed.goal}">
+  <label>Momento</label><div class="grid" style="grid-template-columns:repeat(3,1fr)">${GR.map(([g,l])=>`<button data-act="pg" data-id="${g}" class="${g===ed.group?'sel':''}" style="font-size:14px">${l}</button>`).join('')}</div>
+  <label>Frequenza</label><div class="grid" style="grid-template-columns:repeat(7,1fr)"><button data-act="pall" class="${ed.days.size===7?'sel':''}" style="grid-column:span 7;font-size:16px">Ogni giorno</button>${dm.map((n,i)=>`<button data-act="pd" data-id="${n}" class="${ed.days.has(n)?'sel':''}" style="font-size:16px">${dl[i]}</button>`).join('')}</div>
+  ${ed.id?`<div class="acts"><button class="btn sec" data-act="arch">Archivia</button><button class="btn red" data-act="del" data-id="${ed.id}">Elimina</button></div>`:''}
+  <div class="acts"><button class="btn sec" data-act="close">Annulla</button><button class="btn" data-act="sv">Salva</button></div></div>`;
+  ov.classList.add('open');if(ov.firstElementChild)ov.firstElementChild.scrollTop=old;
+}
+const closeSheet=()=>{$('#ov').classList.remove('open');$('#ov').innerHTML='';ed=null};
+const first1=s=>{const v=s.trim();if(!v)return'';return window.Intl&&Intl.Segmenter?[...new Intl.Segmenter().segment(v)][0].segment:[...v][0]};
+
+/* ===== 6. BACKUP ===== */
+function doExport(){
+  const name='abitudini-backup-'+key(today())+'.json';
+  const blob=new Blob([JSON.stringify({app:'habit-tracker',exportedAt:new Date().toISOString(),...S},null,2)],{type:'application/json'});
+  const mark=()=>{S.lastBackup=key(today());save();render()};
+  const f=new File([blob],name,{type:'application/json'});
+  if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:name}).then(mark).catch(()=>{})}
+  else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);mark()}
+}
+function doImport(file){
+  if(!file)return;
+  const r=new FileReader();
+  r.onerror=()=>toast('Impossibile leggere il file. I tuoi dati non sono stati toccati.');
+  r.onload=()=>{
+    let nd;
+    try{nd=sanitize(JSON.parse(r.result))}
+    catch(e){toast('Importazione annullata: '+(e instanceof SyntaxError?'il file non è un JSON valido.':e.message)+' I tuoi dati non sono stati toccati.');return}
+    if(!confirm('Sostituire i dati attuali ('+S.habits.length+' abitudini) con quelli del file ('+nd.habits.length+' abitudini)?'))return;
+    const prev=S;S=nd;
+    if(save()){ui.sh='all';render();toast('Importazione riuscita.')}else{S=prev;render()}
+  };
+  r.readAsText(file);
+}
+
+/* ===== 7. AZIONI (tocchi sui pulsanti con data-act) ===== */
+const ACT={
+  tab(id){ui.tab=id;render();$('#main').scrollTop=0},
+  sel(id){ui.sel=id;render()},
+  toggle(id){const h=get(id);if(!h)return;const k=ui.sel,g=h.goal||1,was=isDone(h,k);
+    if(g===1){if(was)delete h.log[k];else h.log[k]=1}
+    else if(!was)h.log[k]=(h.log[k]||0)+1;
+    else return toast('Obiettivo raggiunto. Usa − per correggere.');
+    save();render();
+    if(isDone(h,k)&&!was){navigator.vibrate&&navigator.vibrate(15);
+      document.querySelector(`[data-hid="${id}"] .check`)?.classList.add('pop');
+      const c=streaks(h).cur;if(MIL.includes(c)&&ui.sel===key(today()))toast('🎉 '+c+' giorni di fila: '+h.name+'!')}},
+  dec(id){const h=get(id),k=ui.sel,n=(h.log[k]||0)-1;if(n>0)h.log[k]=n;else delete h.log[k];save();render()},
+  note(id){const h=get(id);ed={note:1,id};const ov=$('#ov');
+    ov.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><h2>Nota · ${esc(h.name)}</h2><p class="mut" style="margin-top:-6px">${itd(parse(ui.sel),{weekday:'long',day:'numeric',month:'long'})}</p><textarea id="nt" maxlength="200" rows="4" placeholder="Come è andata?">${esc((h.notes||{})[ui.sel]||'')}</textarea><div class="acts"><button class="btn sec" data-act="close">Annulla</button><button class="btn" data-act="svn">Salva</button></div></div>`;
+    ov.classList.add('open')},
+  svn(){const h=get(ed.id),v=$('#nt').value.trim().slice(0,200);h.notes=h.notes||{};if(v)h.notes[ui.sel]=v;else delete h.notes[ui.sel];save();closeSheet();render()},
+  pg(id){ed.group=id;openSheet()},
+  later(){ui.hideBk=true;render()},
+  reorder(){ui.reorder=!ui.reorder;render()},
+  mv(id,d){const h=get(id),arr=S.habits.filter(x=>!x.archived&&x.group===h.group),o=arr[arr.indexOf(h)+d];if(!o)return;
+    const a=S.habits.indexOf(h),b=S.habits.indexOf(o);[S.habits[a],S.habits[b]]=[S.habits[b],S.habits[a]];save();render()},
+  up(id){ACT.mv(id,-1)},dn(id){ACT.mv(id,1)},
+  new(){ed={id:null,name:'',emoji:'⭐',color:COLORS[0],days:new Set([0,1,2,3,4,5,6]),goal:1,group:''};openSheet()},
+  edit(id){const h=get(id);ed={id,name:h.name,emoji:h.emoji,color:h.color,days:new Set(h.days),goal:h.goal||1,group:h.group||''};openSheet()},
+  pe(id){ed.emoji=id;openSheet()},pc(id){ed.color=id;openSheet()},
+  pd(id){const n=+id;ed.days.has(n)?ed.days.delete(n):ed.days.add(n);openSheet()},
+  pall(){ed.days=new Set([0,1,2,3,4,5,6]);openSheet()},
+  close:closeSheet,
+  sv(){const name=ed.name.trim();if(!name)return toast('Scrivi un nome per l\'abitudine.');if(!ed.days.size)return toast('Scegli almeno un giorno.');
+    const v={name,emoji:ed.emoji||'⭐',color:ed.color,days:[...ed.days],goal:Math.max(1,Math.min(999,parseInt(ed.goal)||1)),group:ed.group},h=ed.id&&get(ed.id);
+    if(h)Object.assign(h,v);else S.habits.push({id:uid(),...v,created:key(today()),archived:false,log:{},notes:{}});
+    save();closeSheet();render()},
+  arch(){const h=get(ed.id);h.archived=true;save();closeSheet();render();toast('Abitudine archiviata.')},
+  restore(id){get(id).archived=false;save();render()},
+  del(id){const h=get(id);if(!confirm('Eliminare "'+h.name+'" e tutto il suo storico? Non si può annullare.'))return;
+    S.habits=S.habits.filter(x=>x.id!==id);save();if(ed)closeSheet();render()},
+  mprev(){ui.mm--;if(ui.mm<0){ui.mm=11;ui.my--}render()},
+  mnext(){ui.mm++;if(ui.mm>11){ui.mm=0;ui.my++}render()},
+  export:doExport,import(){$('#file').click()},
+  reset(){if(confirm('Cancellare TUTTE le abitudini e lo storico? Fai prima un backup.')&&confirm('Sei sicuro? Operazione definitiva.')){S={v:1,habits:[],lastBackup:null};save();render()}}
+};
+document.addEventListener('click',e=>{
+  if(e.target.id==='ov')return closeSheet();
+  const b=e.target.closest('[data-act]');if(b&&!b.disabled&&ACT[b.dataset.act])ACT[b.dataset.act](b.dataset.id,b)});
+document.addEventListener('input',e=>{
+  if(e.target.id==='nm')ed.name=e.target.value;
+  if(e.target.id==='gl')ed.goal=e.target.value;
+  if(e.target.id==='emo'){ed.emoji=first1(e.target.value)}});
+document.addEventListener('change',e=>{
+  if(e.target.id==='sh'){ui.sh=e.target.value;render()}
+  if(e.target.id==='file'){doImport(e.target.files[0]);e.target.value=''}});
+
+/* ===== 8. MEZZANOTTE: se cambia il giorno, torna a "Oggi" ===== */
+function checkDay(){const k=key(today());if(k!==ui.todayKey){ui.todayKey=k;ui.sel=k;ui.my=today().getFullYear();ui.mm=today().getMonth();render()}}
+setInterval(checkDay,30000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkDay()});
+
+/* ===== 9. AVVIO ===== */
+load();render();
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
